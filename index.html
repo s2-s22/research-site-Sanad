@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>مركز الباحث الأكاديمي</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f7f9fc;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      color: #3366cc;
+    }
+    .search-box {
+      margin: 20px auto;
+      width: 60%;
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      font-size: 16px;
+    }
+    .card-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+    .card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      margin: 15px;
+      padding: 20px;
+      width: 280px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      text-align: right;
+    }
+    .card img {
+      max-width: 100%;
+      border-radius: 10px;
+      height: 150px;
+      object-fit: cover;
+    }
+    .footer {
+      margin-top: 40px;
+      font-size: 14px;
+      color: gray;
+    }
+  </style>
+</head>
+<body>
+
+<h1>مركز الباحث الأكاديمي</h1>
+<h2>بإشراف المهندس سند</h2>
+
+<div class="search-box">
+  <input type="text" id="searchInput" placeholder="ابحث عن بحث، رسالة أو رابط..." onkeyup="searchResearch()" />
+</div>
+
+<div id="cards" class="card-container">
+  <p>جارٍ تحميل البيانات...</p>
+</div>
+
+<div class="footer">
+  © 2025 مهندس كهرباء - سند قريب
+</div>
+
+<!-- تحميل مكتبة PapaParse لتحليل ملفات CSV -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script>
+  // تحميل ملف CSV وقراءته
+  fetch('data.csv')
+    .then(response => response.text())
+    .then(csvText => {
+      const data = Papa.parse(csvText, {
+        header: true,
+        skipEmptyLines: true
+      }).data;
+
+      const cardsContainer = document.getElementById('cards');
+      cardsContainer.innerHTML = ''; // تفريغ "جاري التحميل"
+
+      data.forEach(row => {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        card.innerHTML = 
+          <img src="${row["صورة"]}" alt="صورة">
+          <h3>${row["العنوان"]}</h3>
+          <p>${row["الوصف"]}</p>
+          <p><strong>المجال:</strong> ${row["المجال"]}</p>
+          <a href="${row["رابط البحث"]}" target="_blank">رابط البحث</a>
+        ;
+
+        cardsContainer.appendChild(card);
+      });
+    })
+    .catch(error => {
+      document.getElementById('cards').innerHTML = '<p style="color:red;">فشل في تحميل البيانات من CSV.</p>';
+      console.error('CSV Load Error:', error);
+    });
+
+  // البحث المباشر
+  function searchResearch() {
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+      const text = card.innerText.toLowerCase();
+      card.style.display = text.includes(input) ? 'block' : 'none';
+    });
+  }
+</script>
+
+</body>
+</html>
